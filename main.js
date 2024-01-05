@@ -6,6 +6,8 @@
 // @author       Constantin Piber
 // @match        *://diawa.at/partners/index.php?*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=diawa.at
+// @updateURL    https://raw.githubusercontent.com/cpiber/DiawaTimekeeper/main/main.js
+// @downloadURL  https://raw.githubusercontent.com/cpiber/DiawaTimekeeper/main/main.js
 // @sandbox      javascript
 // @grant        GM_log
 // @grant        GM_addStyle
