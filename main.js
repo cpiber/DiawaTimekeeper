@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DIAWA Timekeeper
 // @namespace    https://web.piber.at
-// @version      2024-01-05
+// @version      2024-02-01
 // @description  try to take over the world!
 // @author       Constantin Piber
 // @match        *://diawa.at/partners/index.php?*
@@ -407,6 +407,27 @@
       );
       taskel.classList.toggle("has-ended", !!task.end);
       taskel.dataset.task = i;
+      if (currently_editing?.num !== i) {
+        taskel
+          .querySelectorAll("input.replace-input")
+          .forEach((n) => n.remove());
+        continue;
+      }
+      const displayEl =
+        currently_editing.type === "start"
+          ? taskel.querySelector('[name="start"]')
+          : taskel.querySelector('[name="end"]');
+      displayEl.style.display = "none";
+      if (taskel.querySelector("input.replace-input")) continue;
+      const replaceEl = create("input", {
+        placeholder: `New ${currently_editing.type} time`,
+        value: (currently_editing.type === "start" ? task.start : task.end)
+          .toTimeString()
+          .replace(/(\d\d?:\d{2}:\d{2}).*/, "$1"),
+        type: "time",
+        class: "replace-input",
+      });
+      displayEl.after(replaceEl);
     }
   }
 
@@ -556,6 +577,26 @@
       // if the user navigates away after applying, they likely don't want to see the tasks again on next load
       save(tasks.filter((t) => !("end" in t)));
     }
+    renderMain();
+  });
+  tasksrow.addEventListener("keyup", function (ev) {
+    if (!ev.target.classList.contains("replace-input")) return;
+    if (ev.key !== "Escape" && ev.key !== "Enter") return;
+    const taskel = /** @type {HTMLElement} */ (ev.target).closest(".ext-task");
+    if (!taskel) return;
+    if (ev.key === "Enter" && currently_editing !== undefined) {
+      const task = tasks[+taskel.dataset.task];
+      const curVal = currently_editing.type === "start" ? task.start : task.end;
+      const newVal = new Date(`1970-01-01T${ev.target.value}Z`);
+      if (!curVal || isNaN(newVal.valueOf())) return;
+      curVal.setHours(
+        newVal.getUTCHours(),
+        newVal.getUTCMinutes(),
+        newVal.getUTCSeconds()
+      );
+    }
+    currently_editing = undefined;
+    save();
     renderMain();
   });
 })();
