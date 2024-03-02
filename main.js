@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DIAWA Timekeeper
 // @namespace    https://web.piber.at
-// @version      2024-02-01
+// @version      2024-03-02
 // @description  try to take over the world!
 // @author       Constantin Piber
 // @match        *://diawa.at/partners/index.php?*
@@ -17,6 +17,8 @@
 
 (async function () {
   "use strict";
+
+  if (document.querySelector(".ext-area")) return;
 
   const form = document.querySelector(".recording > form#form_new");
   if (!form) return;
@@ -488,7 +490,7 @@
         total.start = tasks[i].start;
       if (
         total.end === undefined ||
-        tasks[i].end.getTime() < total.end.getTime()
+        tasks[i].end.getTime() > total.end.getTime()
       )
         total.end = tasks[i].end;
       total.duration += tasks[i].end.getTime() - tasks[i].start.getTime();
